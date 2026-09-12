@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "系统": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "当前日期": {
+          "default": "",
+          "type": "string"
+        },
+        "当前时间段": {
+          "default": "",
+          "type": "string"
+        },
+        "当前场景": {
+          "default": "",
+          "type": "string"
+        },
+        "当前场景敌人": {
+          "default": "",
+          "type": "string"
+        },
+        "当前场景魔法少女": {
+          "default": "",
+          "type": "string"
+        }
+      }
+    },
+    "米娅": {
+      "$ref": "#/$defs/__schema0"
+    },
+    "星野绫": {
+      "$ref": "#/$defs/__schema0"
+    },
+    "白鸟薇奥拉": {
+      "$ref": "#/$defs/__schema0"
+    },
+    "夜蝶": {
+      "$ref": "#/$defs/__schema0"
+    },
+    "塞西莉亚": {
+      "$ref": "#/$defs/__schema0"
+    },
+    "奥克塔薇娅": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "无月诺克斯": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "其他魔法少女": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "好感度": {
+            "default": 0,
+            "type": "number"
+          },
+          "改造度": {
+            "default": 0,
+            "type": "number"
+          },
+          "当日消耗魔力": {
+            "default": 0,
+            "type": "number"
+          },
+          "魔力补给方式": {
+            "default": "",
+            "type": "string"
+          },
+          "异常状态": {
+            "default": "",
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "__schema0": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "好感度": {
+          "default": 0,
+          "type": "number"
+        },
+        "改造度": {
+          "default": 0,
+          "type": "number"
+        },
+        "内心想法": {
+          "default": "",
+          "type": "string"
+        },
+        "当日消耗魔力": {
+          "default": 0,
+          "type": "number"
+        },
+        "魔力补给方式": {
+          "default": "",
+          "type": "string"
+        },
+        "是否变身": {
+          "default": false,
+          "type": [
+            "boolean",
+            "string"
+          ]
+        },
+        "吞屌口穴": {
+          "default": "",
+          "type": "string"
+        },
+        "过肺鼻穴": {
+          "default": "",
+          "type": "string"
+        },
+        "灌脑耳穴": {
+          "default": "",
+          "type": "string"
+        },
+        "溢奶乳穴": {
+          "default": "",
+          "type": "string"
+        },
+        "储精淫宫": {
+          "default": "",
+          "type": "string"
+        },
+        "吸精小穴": {
+          "default": "",
+          "type": "string"
+        },
+        "漏电尿穴": {
+          "default": "",
+          "type": "string"
+        },
+        "渴精菊穴": {
+          "default": "",
+          "type": "string"
+        },
+        "骚淫足穴": {
+          "default": "",
+          "type": "string"
+        },
+        "上装拟态": {
+          "default": "",
+          "type": "string"
+        },
+        "下装拟态": {
+          "default": "",
+          "type": "string"
+        },
+        "鞋袜拟态": {
+          "default": "",
+          "type": "string"
+        },
+        "作祟触手": {
+          "default": "",
+          "type": "string"
+        },
+        "异常状态": {
+          "default": "",
+          "type": "string"
+        }
+      }
+    },
+    "__schema1": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "内心想法": {
+          "default": "",
+          "type": "string"
+        },
+        "是否伪装人类": {
+          "default": false,
+          "type": [
+            "boolean",
+            "string"
+          ]
+        },
+        "吞屌口穴": {
+          "default": "",
+          "type": "string"
+        },
+        "过肺鼻穴": {
+          "default": "",
+          "type": "string"
+        },
+        "灌脑耳穴": {
+          "default": "",
+          "type": "string"
+        },
+        "溢奶乳穴": {
+          "default": "",
+          "type": "string"
+        },
+        "储精淫宫": {
+          "default": "",
+          "type": "string"
+        },
+        "吸精小穴": {
+          "default": "",
+          "type": "string"
+        },
+        "漏电尿穴": {
+          "default": "",
+          "type": "string"
+        },
+        "渴精菊穴": {
+          "default": "",
+          "type": "string"
+        },
+        "骚淫足穴": {
+          "default": "",
+          "type": "string"
+        },
+        "上身穿搭": {
+          "default": "",
+          "type": "string"
+        },
+        "下身穿搭": {
+          "default": "",
+          "type": "string"
+        },
+        "鞋袜穿搭": {
+          "default": "",
+          "type": "string"
+        },
+        "异常状态": {
+          "default": "",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
