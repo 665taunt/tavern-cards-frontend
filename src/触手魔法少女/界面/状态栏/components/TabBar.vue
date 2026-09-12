@@ -5,10 +5,9 @@
       :key="tab.id"
       type="button"
       class="tab-btn"
-      :class="[`tab-btn-${tab.id}`, { 'is-active': modelValue === tab.id, 'is-empty': tab.empty }]"
-      :aria-disabled="tab.empty"
+      :class="[`tab-btn-${tab.id}`, { 'is-active': modelValue === tab.id }]"
       :aria-pressed="modelValue === tab.id"
-      @click="!tab.empty && emit('update:modelValue', tab.id)"
+      @click="emit('update:modelValue', tab.id)"
     >
       <img class="tab-ico" :src="tab.icon" :alt="tab.alt">
       {{ tab.label }}
@@ -27,7 +26,7 @@ import type { TabId } from '../composables/useRoster';
  */
 defineProps<{
   modelValue: TabId;
-  tabs: { id: TabId; label: string; icon: string; alt: string; empty: boolean }[];
+  tabs: { id: TabId; label: string; icon: string; alt: string }[];
 }>();
 
 const emit = defineEmits<{ 'update:modelValue': [TabId] }>();
@@ -106,15 +105,5 @@ const emit = defineEmits<{ 'update:modelValue': [TabId] }>();
 .tab-btn:focus-visible {
   outline: 2px solid #fde047;
   outline-offset: 2px;
-}
-
-/* 该页签没有人在场：置灰且不可选中，但不隐藏 —— 保留结构让用户知道还有这一页 */
-.tab-btn.is-empty {
-  cursor: default;
-  opacity: 0.4;
-}
-
-.tab-btn.is-empty:active {
-  transform: none;
 }
 </style>

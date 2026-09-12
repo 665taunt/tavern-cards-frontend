@@ -42,17 +42,24 @@ const { store, girls, enemies, hasGirls, hasEnemies } = useRoster();
 const enemyNames = computed(() => splitNames(store.data.系统.当前场景敌人));
 
 const tabs = computed(() => [
-  { id: 'girls' as const, label: '魔法少女', icon: tabIconUrl('girls'), alt: '魔法少女', empty: !hasGirls.value },
-  { id: 'enemies' as const, label: '触手怪人', icon: tabIconUrl('enemies'), alt: '触手怪人', empty: !hasEnemies.value },
+  { id: 'girls' as const, label: '魔法少女', icon: tabIconUrl('girls'), alt: '魔法少女' },
+  { id: 'enemies' as const, label: '触手怪人', icon: tabIconUrl('enemies'), alt: '触手怪人' },
 ]);
 
 const activeTab = ref<TabId>('girls');
 
-// 当前页签变空（AI 把人都移出场景）时自动切到还有人那边；两边都空则停在魔法少女页
-// 并显示占位提示，绝不留下白板。
+// 只在首次拿到名单时挑一次「有内容的那页」，之后一律由用户点击决定。
+// 两个页签**永远可点**：某一侧没人时切过去会看到 EmptyRoster 占位提示。
+//
+// 这里绝不能写成会随名单变化重新赋值的 watchEffect —— 那会在用户切到空页签后
+// 立刻把页签拉回去，再加上「空页签禁点」，纯魔法少女场景下两个按钮就都点不动了。
+let picked_once = false;
 watchEffect(() => {
-  if (!hasGirls.value && hasEnemies.value) activeTab.value = 'enemies';
-  else if (hasGirls.value && !hasEnemies.value) activeTab.value = 'girls';
+  if (picked_once) return;
+  if (hasGirls.value || hasEnemies.value) {
+    picked_once = true;
+    if (!hasGirls.value) activeTab.value = 'enemies';
+  }
 });
 </script>
 

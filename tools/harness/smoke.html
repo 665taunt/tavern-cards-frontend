@@ -49,7 +49,8 @@
       },
     ];
 
-    const APP_URL = '/dist/触手魔法少女/界面/状态栏/index.html';
+    // 带缓存穿透参数：否则浏览器会复用上一次构建的 bundle，改完代码却看不到变化
+    const APP_URL = '/dist/触手魔法少女/界面/状态栏/index.html?v=' + Date.now();
 
     // 只 mock 应用真正用到的接口；lodash/jQuery 从本地 vendored 文件加载，
     // 这样 CDN 抖动不会被误判成应用 bug。
