@@ -1,0 +1,13 @@
+<head>
+  <!-- 字体走 <link> 而不是 CSS @import：构建会把 global.css 与所有 SFC 的 <style>
+       合并进一个 <style>，而 @import 只有在样式表最前面才生效 —— 顺序一旦不保证
+       就会被静默丢弃，属于能一路活到线上的那类 bug。<link> 与顺序无关。
+       用 testingcf.jsdelivr.net 镜像（技能要求：国内可达），版本钉死以便永久缓存。 -->
+  <link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/@fontsource/noto-serif-jp@5.3.0/700.css">
+  <link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/@fontsource/noto-sans-jp@5.3.0/400.css">
+  <link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/@fontsource/noto-sans-jp@5.3.0/500.css">
+  <link rel="stylesheet" href="https://testingcf.jsdelivr.net/npm/@fontsource/noto-sans-jp@5.3.0/700.css">
+</head>
+<body>
+  <div id="app"></div>
+</body>

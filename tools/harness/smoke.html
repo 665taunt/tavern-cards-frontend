@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>状态栏验证台</title>
+  <style>
+    body { font: 13px/1.5 system-ui, sans-serif; margin: 0; padding: 8px; background: #111; color: #ddd; }
+    .frame { border-bottom: 2px solid #444; padding: 6px 0; }
+    iframe { width: 760px; border: 0; display: block; }
+    h3 { margin: 4px 0 6px; font-size: 12px; color: #888; font-weight: 400; }
+  </style>
+</head>
+<body>
+  <div id="host"></div>
+
+  <script src="/node_modules/lodash/lodash.js"></script>
+  <script src="/node_modules/jquery/dist/jquery.js"></script>
+  <script src="/node_modules/vue/dist/vue.runtime.global.prod.js"></script>
+  <script>
+    // ── fixture：因为 schema 已对全字段 prefault，这里只写关心的字段即可 ──
+    // 每个 fixture 给不同的好感度，跨楼层串值就能被数值抓到。
+    const FIXTURES = [
+      {
+        label: '① 仅米娅（单人场景）',
+        stat: {
+          系统: { 当前日期: '第三日', 当前时间段: '深夜', 当前场景: '清泉市·废弃工厂', 当前场景敌人: '无', 当前场景魔法少女: '米娅' },
+          米娅: { 好感度: 11, 改造度: 22, 当日消耗魔力: 33, 是否变身: true, 内心想法: '今天也要维持平常的样子' },
+        },
+      },
+      {
+        label: '② 全 7 人（旧版 565 元素的最坏情况）',
+        stat: {
+          系统: { 当前日期: '第五日', 当前时间段: '黄昏', 当前场景: '合租公寓', 当前场景敌人: '奥克塔薇娅,无月诺克斯', 当前场景魔法少女: '米娅,星野绫,白鸟薇奥拉,夜蝶,塞西莉亚' },
+          米娅: { 好感度: 22, 内心想法: '米娅的想法' },
+          星野绫: { 好感度: 33, 内心想法: '绫的想法' },
+          白鸟薇奥拉: { 好感度: 44, 内心想法: '薇奥拉的想法' },
+          夜蝶: { 好感度: 55, 是否变身: true, 内心想法: '夜蝶的想法' },
+          塞西莉亚: { 好感度: 66, 内心想法: '塞西莉亚的想法' },
+          奥克塔薇娅: { 是否伪装人类: '人类形态', 内心想法: '奥克塔薇娅的想法' },
+          无月诺克斯: { 是否伪装人类: '出战形态', 内心想法: '诺克斯的想法' },
+        },
+      },
+      {
+        label: '③ 仅敌人',
+        stat: {
+          系统: { 当前日期: '第七日', 当前时间段: '正午', 当前场景: '野外清缴点', 当前场景敌人: '无月诺克斯', 当前场景魔法少女: '无' },
+          无月诺克斯: { 好感度: 77, 是否伪装人类: false, 内心想法: '稿子还差三张' },
+        },
+      },
+    ];
+
+    const APP_URL = '/dist/触手魔法少女/界面/状态栏/index.html';
+
+    // 只 mock 应用真正用到的接口；lodash/jQuery 从本地 vendored 文件加载，
+    // 这样 CDN 抖动不会被误判成应用 bug。
+    function prelude(messageId) {
+      return `
+        window.__MESSAGE_ID = ${messageId};
+        window.__LOAD_COUNT = (window.__LOAD_COUNT || 0) + 1;
+        window.__STAT = window.parent.__FIXTURES[${messageId}].stat;
+        window.getVariables = () => ({ stat_data: window.__STAT });
+        window.updateVariablesWith = () => {};
+        window.getCurrentMessageId = () => window.__MESSAGE_ID;
+        window.waitGlobalInitialized = (name) => {
+          window[name] = window[name] || {};
+          return Promise.resolve();
+        };
+        window.Mvu = {
+          getMvuData: () => ({ stat_data: window.__STAT }),
+          replaceMvuData: async () => {},
+        };
+        // 真实实现是「弹 toastr 后重新抛出」；验证台里直接透传，让错误冒到控制台
+        window.errorCatched = (fn) => fn;
+      `;
+    }
+
+    window.__FIXTURES = FIXTURES;
+
+    const host = document.getElementById('host');
+    FIXTURES.forEach((fx, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'frame';
+      wrap.innerHTML = `<h3>${fx.label}</h3>`;
+      const frame = document.createElement('iframe');
+      frame.id = 'frame-' + i;
+      frame.dataset.messageId = String(i);
+      // 与真实 TavernHelper iframe 的预注入顺序一致：lodash → jQuery → Vue → 应用全局 → 应用本体。
+      // z(zod) 在真实环境由父页面注入，这里用 ESM 从 CDN 取等价的命名空间。
+      // 用 type="module" 顺带拿到「延迟执行」语义：此时经典脚本已就绪，$ 一定可用。
+      frame.srcdoc = `<!doctype html><html><head><meta charset="utf-8">
+        <script src="/node_modules/lodash/lodash.js"><\/script>
+        <script src="/node_modules/jquery/dist/jquery.js"><\/script>
+        <script src="/node_modules/vue/dist/vue.runtime.global.prod.js"><\/script>
+        <script>${prelude(i)}<\/script>
+        </head><body>
+        <script type="module">
+          import * as z from 'https://testingcf.jsdelivr.net/npm/zod@4.6.1/+esm';
+          window.z = z;
+          $('body').load('${APP_URL}');
+        <\/script>
+        </body></html>`;
+      // 复刻 TavernHelper 的 adjust_iframe_height：用 ResizeObserver 跟随 body 高度。
+      // 真实环境由扩展注入，这里自己补，否则 iframe 只有默认的 150px，内容会被裁掉。
+      frame.addEventListener('load', () => {
+        const doc = frame.contentDocument;
+        if (!doc?.body) return;
+        const fit = () => {
+          frame.style.height = doc.body.scrollHeight + 'px';
+        };
+        new ResizeObserver(fit).observe(doc.body);
+        fit();
+      });
+
+      wrap.appendChild(frame);
+      host.appendChild(wrap);
+    });
+  </script>
+</body>
+</html>

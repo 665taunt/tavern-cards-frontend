@@ -1,0 +1,69 @@
+/* 全局重置与设计令牌。
+   本界面跑在 TavernHelper 的 iframe 里，样式天然隔离，
+   因此规则直接写裸选择器即可，无需前缀。 */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* ── 配色：按功能语义命名，禁止用视觉描述命名 ── */
+  --c-surface: #0f0f23;
+  --c-surface-raised: #27273b;
+  --c-surface-inset: rgba(15, 15, 35, 0.6);
+  --c-text: #e2e8f0;
+  --c-text-muted: #94a3b8;
+  --c-border: #4c1d95;
+  --c-primary: #7c3aed;
+  --c-primary-soft: #a78bfa;
+  --c-danger: #f43f5e;
+  --c-danger-soft: rgba(244, 63, 94, 0.12);
+  --c-danger-border: rgba(244, 63, 94, 0.35);
+  --c-track: rgba(255, 255, 255, 0.08);
+
+  /* 进度条渐变 */
+  --c-progress-bond: linear-gradient(90deg, #6d28d9, #7c3aed, #a78bfa);
+  --c-progress-corruption: linear-gradient(90deg, #be185d, #ec4899, #f9a8d4);
+  --c-progress-magic: linear-gradient(90deg, #e11d48, #f43f5e, #fb7185);
+
+  /* 异常状态条 */
+  --c-anomaly-surface: linear-gradient(135deg, rgba(244, 63, 94, 0.14), rgba(124, 58, 237, 0.14));
+  --c-anomaly-border: #ec4899;
+  --c-anomaly-text: #fbcfe8;
+
+  /* 变身标签默认（魔法少女：紫） */
+  --c-transform-on-bg: rgba(124, 58, 237, 0.2);
+  --c-transform-on-border: rgba(124, 58, 237, 0.5);
+  --c-transform-on-text: var(--c-primary-soft);
+  --c-transform-off-bg: rgba(148, 163, 184, 0.12);
+  --c-transform-off-border: rgba(148, 163, 184, 0.35);
+  --c-transform-off-text: var(--c-text-muted);
+
+  /* 圆角 */
+  --radius-panel: 12px;
+  --radius-card: 10px;
+
+  /* 字体：整体走 Noto 字族，但每一栈都必须带中文回退 ——
+     Noto Sans/Serif JP 的 unicode-range 覆盖不到「娅」(U+5A05) 等汉字，
+     缺了回退会让角色名出现混排字重。 */
+  --font-serif: 'Noto Serif JP', 'Source Han Serif SC', 'Songti SC', 'SimSun', serif;
+  --font-sans: 'Noto Sans JP', system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--c-text);
+  background: transparent;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
