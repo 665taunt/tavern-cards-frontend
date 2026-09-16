@@ -24,7 +24,11 @@
     "@types/toastr": "^2.1.44",
     "@types/webpack": "^5.28.5",
     "@typescript-eslint/parser": "^8.70.0",
+<<<<<<< HEAD
     "autoprefixer": "^10.6.1",
+=======
+    "autoprefixer": "^10.6.0",
+>>>>>>> 2dc3a4c6557394b004089da10a6c56467e18b325
     "chokidar": "^5.0.0",
     "css-loader": "^7.1.5",
     "eslint": "^10.10.0",
@@ -104,7 +108,11 @@
     "vue-word-highlighter": "^1.2.6",
     "vue3-pixi": "1.0.1",
     "yaml": "^2.9.1",
+<<<<<<< HEAD
     "zod": "^4.6.5"
+=======
+    "zod": "^4.6.4"
+>>>>>>> 2dc3a4c6557394b004089da10a6c56467e18b325
   },
   "pnpm": {
     "onlyBuiltDependencies": [
