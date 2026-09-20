@@ -18,6 +18,14 @@
           "default": "",
           "type": "string"
         },
+        "当前场景类型": {
+          "default": "非战斗",
+          "type": "string"
+        },
+        "当前场景场合": {
+          "default": "私密",
+          "type": "string"
+        },
         "当前场景敌人": {
           "default": "",
           "type": "string"
@@ -66,6 +74,10 @@
             "default": 0,
             "type": "number"
           },
+          "魔力上限": {
+            "default": 0,
+            "type": "number"
+          },
           "当日消耗魔力": {
             "default": 0,
             "type": "number"
@@ -92,6 +104,10 @@
           "type": "number"
         },
         "改造度": {
+          "default": 0,
+          "type": "number"
+        },
+        "魔力上限": {
           "default": 0,
           "type": "number"
         },

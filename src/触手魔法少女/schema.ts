@@ -14,6 +14,7 @@ const girlSchema = z
   .object({
     好感度: z.coerce.number().prefault(0).transform((v) => _.clamp(v, 0, 100)),
     改造度: z.coerce.number().prefault(0).transform((v) => _.clamp(v, 0, 100)),
+    魔力上限: z.coerce.number().prefault(0).transform((v) => _.clamp(v, 20, 120)),
     内心想法: z.string().prefault(''),
     当日消耗魔力: z.coerce.number().prefault(0).transform((v) => _.clamp(v, 0, 100)),
     魔力补给方式: z.string().prefault(''),
@@ -61,6 +62,8 @@ export const Schema = z.object({
       当前日期: z.string().prefault(''),
       当前时间段: z.string().prefault(''),
       当前场景: z.string().prefault(''),
+      当前场景类型: z.string().prefault('非战斗'), // 战斗/非战斗：正文中当事人是否正在交战
+      当前场景场合: z.string().prefault('私密'), // 公开/私密：场景内是否存在 <user> 与魔法少女之外的目击者
       当前场景敌人: z.string().prefault(''), // 逗号分隔的敌人姓名列表（如"奥克塔薇娅,无月诺克斯"），无敌人时写"无"
       当前场景魔法少女: z.string().prefault(''),
     })
@@ -77,6 +80,7 @@ export const Schema = z.object({
       z.object({
         好感度: z.coerce.number().prefault(0).transform((v) => _.clamp(v, 0, 100)),
         改造度: z.coerce.number().prefault(0).transform((v) => _.clamp(v, 0, 100)),
+        魔力上限: z.coerce.number().prefault(0).transform((v) => _.clamp(v, 20, 120)),
         当日消耗魔力: z.coerce.number().prefault(0).transform((v) => _.clamp(v, 0, 100)),
         魔力补给方式: z.string().prefault(''),
         异常状态: z.string().prefault(''),

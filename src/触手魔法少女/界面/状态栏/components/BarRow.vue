@@ -1,11 +1,11 @@
 <template>
   <div class="bar-row">
     <KvRow :label="label">
-      <span v-if="tag" class="magic-tag">{{ value }}%</span>
-      <template v-else>{{ value }}/100</template>
+      <span v-if="tag" class="magic-tag">{{ value }}/{{ safeMax }}</span>
+      <template v-else>{{ value }}/{{ safeMax }}</template>
     </KvRow>
     <div class="bar">
-      <div class="bar-fill" :class="kind" :style="{ width: clamped + '%' }" />
+      <div class="bar-fill" :class="kind" :style="{ width: pct + '%' }" />
     </div>
   </div>
 </template>
@@ -13,17 +13,27 @@
 <script setup lang="ts">
 import KvRow from './KvRow.vue';
 
-const props = defineProps<{
-  label: string;
-  value: number;
-  /** 决定进度条配色：羁绊 / 改造度 / 魔力 */
-  kind: 'bond' | 'corruption' | 'magic';
-  /** 魔力用胶囊标签展示，数值后带 %；羁绊与改造度是 x/100 */
-  tag?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    label: string;
+    value: number;
+    /** 决定进度条配色：羁绊 / 改造度 / 魔力 */
+    kind: 'bond' | 'corruption' | 'magic';
+    /** 满格对应的值：羁绊与改造度用默认的 100，魔力行传该角色的「魔力上限」 */
+    max?: number;
+    /** 魔力用胶囊标签展示；羁绊与改造度是纯文本 */
+    tag?: boolean;
+  }>(),
+  { max: 100 },
+);
 
-// schema 已 clamp 过，这里再兜一层：AI 写坏值时宁可条走满也不要 NaN 宽度
-const clamped = computed(() => _.clamp(Number(props.value) || 0, 0, 100));
+// schema 已 clamp 过，这里再兜一层：值和上限都可能被 AI 写坏，
+// 此时宁可条走满，也不要 NaN 宽度或除零
+const safeMax = computed(() => {
+  const m = Number(props.max);
+  return Number.isFinite(m) && m > 0 ? m : 100;
+});
+const pct = computed(() => _.clamp(((Number(props.value) || 0) / safeMax.value) * 100, 0, 100));
 </script>
 
 <style scoped>

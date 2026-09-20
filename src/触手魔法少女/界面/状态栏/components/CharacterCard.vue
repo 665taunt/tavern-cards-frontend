@@ -21,7 +21,13 @@
 
         <!-- 魔力：女主三条，临时 NPC 无变身行 -->
         <StatCard v-if="variant !== 'enemy'" label="魔力">
-          <BarRow label="当日消耗魔力" :value="num('当日消耗魔力')" kind="magic" tag />
+          <BarRow
+            label="当日消耗魔力"
+            :value="num('当日消耗魔力')"
+            :max="num('魔力上限')"
+            kind="magic"
+            tag
+          />
           <KvRow label="补魔方式">{{ str('魔力补给方式') }}</KvRow>
           <KvRow v-if="variant === 'girl'" label="是否变身">
             <TransformTag :active="bool('是否变身')" on-label="变身中" off-label="日常形态" />
