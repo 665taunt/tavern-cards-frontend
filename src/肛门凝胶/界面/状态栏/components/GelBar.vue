@@ -1,0 +1,511 @@
+<template>
+  <section class="gel-block">
+    <header class="gel-head">
+      <span class="gel-title">肠道凝胶</span>
+      <span class="gel-meta">{{ capacityText }} · 便意 {{ desireLevel }} 阶</span>
+    </header>
+
+    <div class="gel-bar-wrap">
+      <div class="gel-track" :class="{ 'is-empty': !segments.length }">
+        <!-- 玻璃管本体：底噪 + 刻度 + 高光边 -->
+        <div class="gel-glass" aria-hidden="true">
+          <span class="gel-tick" style="left: 25%"></span>
+          <span class="gel-tick" style="left: 50%"></span>
+          <span class="gel-tick" style="left: 75%"></span>
+          <span class="gel-specular"></span>
+        </div>
+
+        <!-- 色块：从右向左堆放，索引 0 是最早生成的那一段 -->
+        <div
+          v-for="(seg, index) in segments"
+          :key="`${index}-${seg.name}`"
+          class="gel-seg"
+          :class="{ 'is-active': activeIndex === index, 'is-shaking': shakingIndex === index }"
+          :style="segStyle(seg)"
+          @mouseenter="hoveredIndex = index"
+          @mouseleave="hoveredIndex = -1"
+          @click="onSegmentClick(index)"
+        >
+          <span class="gel-wave" aria-hidden="true"></span>
+          <span class="gel-gloss" aria-hidden="true"></span>
+        </div>
+
+        <p v-if="!segments.length" class="gel-empty">肠里是空的</p>
+
+        <!-- 总占据：永远钉在所有色块的最左边 -->
+        <span class="gel-total" :style="{ '--c-total': totalColor }"> 占据 {{ occupyText }} </span>
+      </div>
+
+      <Transition name="tip">
+        <div v-if="activeSeg" class="gel-tip" :style="tipStyle" role="tooltip" aria-live="polite">
+          <span class="gel-tip-name">{{ displayName(activeSeg.name) }}</span>
+          <span class="gel-tip-row">
+            <span class="gel-tip-volume">{{ Math.round(activeSeg.volume) }} ml</span>
+            <span class="gel-tip-dot">·</span>
+            <span class="gel-tip-pct">占据 {{ formatPct(activeSeg.occupy) }}</span>
+          </span>
+        </div>
+      </Transition>
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { resolveGelColor, withAlpha, type GelColor } from '../composables/useGelColors';
+
+interface Segment {
+  name: string;
+  volume: number;
+  /** 占整条玻璃管宽度的百分比 */
+  width: number;
+  /** 距右端的偏移百分比：越早生成的越靠右 */
+  right: number;
+  /** 占总容量的百分比，即这一段自己贡献的占据 */
+  occupy: number;
+  color: GelColor;
+}
+
+const props = withDefaults(
+  defineProps<{
+    /** 肠道内凝胶：键为情感名或高潮情境命名，值为毫升 */
+    record: Record<string, number>;
+    /** 肠道容量（毫升） */
+    capacity: number;
+    /** 占据百分比，来自变量；色块长度与它保持一致 */
+    occupy: number;
+    /** 便意等级 0~5 */
+    desireLevel: number;
+  }>(),
+  { desireLevel: 0 },
+);
+
+const hoveredIndex = ref(-1);
+const pinnedIndex = ref(-1);
+const shakingIndex = ref(-1);
+
+/** 色块分段：入肠顺序即记录的插入顺序，索引 0 放最右 */
+const segments = computed<Segment[]>(() => {
+  const capacity = Number(props.capacity);
+  const safeCapacity = Number.isFinite(capacity) && capacity > 0 ? capacity : 500;
+
+  const entries = Object.entries(props.record ?? {})
+    .map(([name, volume]) => ({ name, volume: Number(volume) }))
+    .filter(item => Number.isFinite(item.volume) && item.volume > 0);
+
+  if (!entries.length) return [];
+
+  // 每段先按「体积 ÷ 容量」算出自己的长度，再按总量缩放，
+  // 这样占据超过 100% 时色块仍填满整条管，比例关系不丢。
+  const rawWidths = entries.map(item => (item.volume / safeCapacity) * 100);
+  const rawTotal = rawWidths.reduce((sum, width) => sum + width, 0);
+  const scale = rawTotal > 100 ? 100 / rawTotal : 1;
+
+  let offset = 0;
+  return entries.map((item, index) => {
+    const width = rawWidths[index] * scale;
+    const segment: Segment = {
+      name: item.name,
+      volume: item.volume,
+      width,
+      right: offset,
+      occupy: (item.volume / safeCapacity) * 100,
+      color: resolveGelColor(item.name),
+    };
+    offset += width;
+    return segment;
+  });
+});
+
+const totalVolume = computed(() => segments.value.reduce((sum, seg) => sum + seg.volume, 0));
+
+const activeIndex = computed(() => (pinnedIndex.value >= 0 ? pinnedIndex.value : hoveredIndex.value));
+const activeSeg = computed(() => (activeIndex.value >= 0 ? (segments.value[activeIndex.value] ?? null) : null));
+
+const occupyText = computed(() => {
+  const value = Number(props.occupy);
+  const fallback = totalVolume.value && props.capacity ? (totalVolume.value / props.capacity) * 100 : 0;
+  return `${formatPct(Number.isFinite(value) && value > 0 ? value : fallback)}`;
+});
+
+const capacityText = computed(() => `${Math.round(Number(props.capacity) || 0)} ml`);
+const totalColor = computed(() =>
+  segments.value.length ? segments.value[segments.value.length - 1].color.solid : '#9AA7B8',
+);
+
+/** 提示框落在色块中心上方；贴边时夹住，避免被裁掉 */
+const tipStyle = computed(() => {
+  const seg = activeSeg.value;
+  if (!seg) return {};
+  const center = 100 - (seg.right + seg.width / 2);
+  const left = _.clamp(center, 12, 88);
+  return {
+    left: `${left}%`,
+    '--c-tip-bg': withAlpha(seg.color.solid, 0.96),
+    '--c-tip-fg': seg.color.fg,
+    '--c-tip-glow': withAlpha(seg.color.solid, 0.45),
+  } as Record<string, string>;
+});
+
+function segStyle(seg: Segment): Record<string, string> {
+  return {
+    right: `${seg.right}%`,
+    width: `${seg.width}%`,
+    '--c-gel': seg.color.solid,
+    '--c-gel-soft': withAlpha(seg.color.solid, 0.84),
+    '--c-gel-edge': withAlpha(seg.color.solid, 0.98),
+    '--c-gel-glow': withAlpha(seg.color.solid, 0.4),
+  };
+}
+
+/** 记录键可能是一整句情境命名，过长时只留前段做提示框标题 */
+function displayName(name: string): string {
+  const text = String(name ?? '').trim();
+  return text.length > 26 ? `${text.slice(0, 25)}…` : text;
+}
+
+function formatPct(value: number): string {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '0%';
+  return `${num >= 10 ? Math.round(num) : Math.round(num * 10) / 10}%`;
+}
+
+/** 点击：定住提示框并让色块抖一下，触屏上也能读到信息 */
+function onSegmentClick(index: number) {
+  pinnedIndex.value = pinnedIndex.value === index ? -1 : index;
+  shakingIndex.value = index;
+  window.setTimeout(() => {
+    if (shakingIndex.value === index) shakingIndex.value = -1;
+  }, 460);
+}
+</script>
+
+<style scoped>
+.gel-block {
+  position: relative;
+  container-type: inline-size;
+}
+
+.gel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.gel-title {
+  font-family: var(--font-serif);
+  font-size: 12.5px;
+  letter-spacing: 0.14em;
+  color: var(--c-primary-soft);
+}
+
+.gel-meta {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--c-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.gel-bar-wrap {
+  position: relative;
+}
+
+/* ── 玻璃管：15pt 厚、横向铺满 ── */
+.gel-track {
+  position: relative;
+  height: 15pt;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 40%, rgba(0, 0, 0, 0.28));
+  border: 1px solid var(--c-track-edge);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.24),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.5),
+    inset 0 0 12px rgba(0, 0, 0, 0.35),
+    0 2px 10px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px) saturate(130%);
+  -webkit-backdrop-filter: blur(6px) saturate(130%);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.gel-glass {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--glass-specular);
+  mix-blend-mode: screen;
+  opacity: 0.55;
+}
+
+.gel-specular {
+  position: absolute;
+  left: 2%;
+  right: 2%;
+  top: 1px;
+  height: 32%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 45%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(1px);
+  opacity: 0.7;
+}
+
+.gel-tick {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* ── 凝胶色块 ── */
+.gel-seg {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  z-index: 1;
+  min-width: 2px;
+  border-radius: 3px;
+  background:
+    radial-gradient(120% 90% at 50% -20%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 62%),
+    linear-gradient(180deg, var(--c-gel-soft), var(--c-gel-edge));
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.3),
+    0 0 6px var(--c-gel-glow);
+  transform-origin: center bottom;
+  transition:
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 220ms ease,
+    filter 220ms ease;
+  cursor: pointer;
+  animation: gelBreathe 4.2s ease-in-out infinite;
+}
+
+.gel-seg:nth-of-type(2n) {
+  animation-delay: -1.1s;
+}
+
+.gel-seg:nth-of-type(3n) {
+  animation-delay: -2.3s;
+}
+
+/* 液面波动：一层横向扫过的光 + 一层上下起伏的内芯 */
+.gel-wave {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  opacity: 0.75;
+  background: repeating-linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0 6px,
+    rgba(255, 255, 255, 0.22) 6px 7px,
+    rgba(255, 255, 255, 0) 7px 14px
+  );
+  background-size: 200% 100%;
+  animation: gelFlow 3.4s linear infinite;
+  mix-blend-mode: screen;
+}
+
+.gel-wave::after {
+  content: '';
+  position: absolute;
+  left: -30%;
+  bottom: -40%;
+  width: 160%;
+  height: 90%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 68%);
+  animation: gelSurge 3.8s ease-in-out infinite;
+}
+
+.gel-gloss {
+  position: absolute;
+  inset: 1px 2px auto 2px;
+  height: 34%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0));
+  opacity: 0.6;
+}
+
+/* 悬停：果冻回弹 */
+.gel-seg:hover,
+.gel-seg.is-active {
+  transform: translateY(-1.5px) scaleY(1.22) scaleX(1.02);
+  filter: saturate(118%) brightness(1.06);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.7),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.26),
+    0 0 14px var(--c-gel-glow),
+    0 0 3px rgba(255, 255, 255, 0.6);
+}
+
+.gel-seg.is-shaking {
+  animation: gelShake 440ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* ── 总占据：钉在最左 ── */
+.gel-total {
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  z-index: 3;
+  transform: translateY(-50%);
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(10, 8, 12, 0.82);
+  border: 1px solid var(--c-total, var(--c-primary));
+  color: #f6ece6;
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--c-total, #f2a870) 55%, transparent);
+  pointer-events: none;
+}
+
+.gel-empty {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--c-text-faint);
+}
+
+/* ── 提示框：与色块同色，落在色块中心上方 ── */
+.gel-tip {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  transform: translateX(-50%);
+  z-index: 6;
+  width: max-content;
+  min-width: 118px;
+  max-width: 208px;
+  padding: 6px 10px 7px;
+  border-radius: 9px;
+  background: var(--c-tip-bg, rgba(20, 16, 20, 0.95));
+  color: var(--c-tip-fg, #fff);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.45),
+    0 0 12px var(--c-tip-glow, rgba(242, 168, 112, 0.4));
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.gel-tip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--c-tip-bg, rgba(20, 16, 20, 0.95));
+  border-right: 1px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.gel-tip-name {
+  font-family: var(--font-serif);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.gel-tip-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0.94;
+}
+
+.gel-tip-dot {
+  opacity: 0.6;
+}
+
+.tip-enter-active,
+.tip-leave-active {
+  transition:
+    opacity 160ms ease,
+    transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tip-enter-from,
+.tip-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(4px) scale(0.94);
+}
+
+@keyframes gelFlow {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -28px 0;
+  }
+}
+
+@keyframes gelSurge {
+  0%,
+  100% {
+    transform: translateX(-6%) translateY(2px) scaleY(0.86);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(4%) translateY(-2px) scaleY(1.04);
+    opacity: 0.85;
+  }
+}
+
+@keyframes gelBreathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.08);
+  }
+}
+
+@keyframes gelShake {
+  0% {
+    transform: translateX(0) scaleY(1.1);
+  }
+  18% {
+    transform: translateX(-2px) scaleY(1.24) skewX(-3deg);
+  }
+  36% {
+    transform: translateX(2px) scaleY(0.94) skewX(3deg);
+  }
+  54% {
+    transform: translateX(-1.5px) scaleY(1.18) skewX(-2deg);
+  }
+  72% {
+    transform: translateX(1px) scaleY(1.02) skewX(1.5deg);
+  }
+  100% {
+    transform: translateX(0) scaleY(1.08);
+  }
+}
+</style>

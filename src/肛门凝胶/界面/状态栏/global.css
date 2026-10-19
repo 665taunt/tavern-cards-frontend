@@ -1,0 +1,67 @@
+/* 全局重置与设计令牌。
+   本界面跑在 TavernHelper 的 iframe 里，样式天然隔离，
+   因此规则直接写裸选择器即可，无需前缀。 */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* ── 配色：按功能语义命名，禁止用视觉描述命名 ── */
+  --c-surface: rgba(18, 14, 20, 0.62);
+  --c-surface-raised: rgba(38, 28, 32, 0.55);
+  --c-surface-inset: rgba(10, 8, 12, 0.55);
+  --c-text: #f4eae4;
+  --c-text-muted: #c2a89c;
+  --c-text-faint: #8d766d;
+  --c-border: rgba(242, 168, 112, 0.26);
+  --c-border-strong: rgba(242, 168, 112, 0.5);
+  --c-primary: #f2a870;
+  --c-primary-soft: #f7cba8;
+  --c-accent: #d69a96;
+  --c-track: rgba(255, 255, 255, 0.09);
+  --c-track-edge: rgba(255, 255, 255, 0.16);
+
+  /* 玻璃质感：高光边 + 内阴影，配合 backdrop-filter 使用 */
+  --glass-specular: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.34) 0%,
+    rgba(255, 255, 255, 0.06) 26%,
+    rgba(255, 255, 255, 0) 48%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+
+  /* 四阶段色阶：由浅到深，对应改造推进 */
+  --c-stage-1: #9fb4c7;
+  --c-stage-2: #c9a3b5;
+  --c-stage-3: #b8748a;
+  --c-stage-4: #8e2c3f;
+
+  /* 圆角 */
+  --radius-panel: 14px;
+  --radius-card: 10px;
+  --radius-pill: 999px;
+
+  /* 字体：每一栈都必须带中文回退，避免缺字时字重混排 */
+  --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'SimSun', serif;
+  --font-sans: 'Noto Sans SC', system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--c-text);
+  background: transparent;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
