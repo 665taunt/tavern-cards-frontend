@@ -1,0 +1,588 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "系统": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "当前日期": {
+          "default": "2026/08/31",
+          "type": "string"
+        },
+        "当前时间段": {
+          "default": "清晨",
+          "type": "string",
+          "enum": [
+            "清晨",
+            "上午",
+            "午间",
+            "下午",
+            "傍晚",
+            "夜晚"
+          ]
+        },
+        "当前场景": {
+          "default": "沈家",
+          "type": "string"
+        },
+        "当前场合": {
+          "default": "私密",
+          "type": "string",
+          "enum": [
+            "公开",
+            "私密"
+          ]
+        },
+        "当前在场女角色": {
+          "default": "沈栖迟",
+          "type": "string"
+        },
+        "当前清算对象": {
+          "default": "无",
+          "type": "string"
+        },
+        "复仇进度": {
+          "default": "名单已定",
+          "type": "string",
+          "enum": [
+            "未开场",
+            "名单已定",
+            "清算中",
+            "清算完成"
+          ]
+        }
+      }
+    },
+    "沈栖迟": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "阶段": {
+          "default": "初步倒转",
+          "type": "string",
+          "enum": [
+            "沾染",
+            "初步倒转",
+            "深层重塑",
+            "完全母猪化"
+          ]
+        },
+        "灵魂改造度": {
+          "default": 60,
+          "type": "number"
+        },
+        "菊穴扩张度": {
+          "default": 220,
+          "type": "number"
+        },
+        "菊穴直径": {
+          "default": 3.2,
+          "type": "number"
+        },
+        "敏感度": {
+          "default": 2,
+          "type": "number"
+        },
+        "肠道容量": {
+          "default": 700,
+          "type": "number"
+        },
+        "肠道内凝胶": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "占据百分比": {
+          "default": 0,
+          "type": "number"
+        },
+        "便意等级": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴插入物": {
+          "default": "无",
+          "type": "string",
+          "enum": [
+            "无",
+            "手指",
+            "肛塞",
+            "肛门拉珠",
+            "假阳具",
+            "其他"
+          ]
+        },
+        "排出凝胶总量": {
+          "default": 60,
+          "type": "number"
+        },
+        "本次高潮情境": {
+          "default": "无",
+          "type": "string"
+        },
+        "排出姿势": {
+          "default": "站在床边，踮脚，上身后压，撅臀",
+          "type": "string"
+        },
+        "淫纹": {
+          "default": "小腹正中，掌心大，蜜桃橙色微光",
+          "type": "string"
+        },
+        "上装": {
+          "default": "白色连衣裙",
+          "type": "string"
+        },
+        "下装": {
+          "default": "白色连衣裙裙摆",
+          "type": "string"
+        },
+        "内衣": {
+          "default": "白色棉质内裤",
+          "type": "string"
+        },
+        "袜子": {
+          "default": "白色短袜",
+          "type": "string"
+        },
+        "鞋子": {
+          "default": "浅口平底鞋",
+          "type": "string"
+        },
+        "内心想法": {
+          "default": "想让他一直看着",
+          "type": "string"
+        }
+      }
+    },
+    "陆清晏": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "阶段": {
+          "default": "沾染",
+          "type": "string",
+          "enum": [
+            "沾染",
+            "初步倒转",
+            "深层重塑",
+            "完全母猪化"
+          ]
+        },
+        "灵魂改造度": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴扩张度": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴直径": {
+          "default": 2,
+          "type": "number"
+        },
+        "敏感度": {
+          "default": 0,
+          "type": "number"
+        },
+        "肠道容量": {
+          "default": 500,
+          "type": "number"
+        },
+        "肠道内凝胶": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "占据百分比": {
+          "default": 0,
+          "type": "number"
+        },
+        "便意等级": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴插入物": {
+          "default": "无",
+          "type": "string",
+          "enum": [
+            "无",
+            "手指",
+            "肛塞",
+            "肛门拉珠",
+            "假阳具",
+            "其他"
+          ]
+        },
+        "排出凝胶总量": {
+          "default": 0,
+          "type": "number"
+        },
+        "本次高潮情境": {
+          "default": "无",
+          "type": "string"
+        },
+        "排出姿势": {
+          "default": "无",
+          "type": "string"
+        },
+        "淫纹": {
+          "default": "尚未浮现",
+          "type": "string"
+        },
+        "上装": {
+          "default": "红色西装上衣（官方学生制服）",
+          "type": "string"
+        },
+        "下装": {
+          "default": "红色短裙（官方学生制服）",
+          "type": "string"
+        },
+        "内衣": {
+          "default": "黑色蕾丝内衣",
+          "type": "string"
+        },
+        "袜子": {
+          "default": "黑色长袜",
+          "type": "string"
+        },
+        "鞋子": {
+          "default": "黑色乐福鞋",
+          "type": "string"
+        },
+        "内心想法": {
+          "default": "今天也要把场面撑住",
+          "type": "string"
+        }
+      }
+    },
+    "傅翎": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "阶段": {
+          "default": "沾染",
+          "type": "string",
+          "enum": [
+            "沾染",
+            "初步倒转",
+            "深层重塑",
+            "完全母猪化"
+          ]
+        },
+        "灵魂改造度": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴扩张度": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴直径": {
+          "default": 2,
+          "type": "number"
+        },
+        "敏感度": {
+          "default": 0,
+          "type": "number"
+        },
+        "肠道容量": {
+          "default": 500,
+          "type": "number"
+        },
+        "肠道内凝胶": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "占据百分比": {
+          "default": 0,
+          "type": "number"
+        },
+        "便意等级": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴插入物": {
+          "default": "肛塞",
+          "type": "string",
+          "enum": [
+            "无",
+            "手指",
+            "肛塞",
+            "肛门拉珠",
+            "假阳具",
+            "其他"
+          ]
+        },
+        "排出凝胶总量": {
+          "default": 0,
+          "type": "number"
+        },
+        "本次高潮情境": {
+          "default": "无",
+          "type": "string"
+        },
+        "排出姿势": {
+          "default": "无",
+          "type": "string"
+        },
+        "淫纹": {
+          "default": "尚未浮现",
+          "type": "string"
+        },
+        "上装": {
+          "default": "黑色吊带练功服与薄纱裙",
+          "type": "string"
+        },
+        "下装": {
+          "default": "薄纱裙",
+          "type": "string"
+        },
+        "内衣": {
+          "default": "无",
+          "type": "string"
+        },
+        "袜子": {
+          "default": "白色连裤袜",
+          "type": "string"
+        },
+        "鞋子": {
+          "default": "芭蕾软鞋",
+          "type": "string"
+        },
+        "内心想法": {
+          "default": "再撑一组动作",
+          "type": "string"
+        }
+      }
+    },
+    "温晓棠": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "阶段": {
+          "default": "沾染",
+          "type": "string",
+          "enum": [
+            "沾染",
+            "初步倒转",
+            "深层重塑",
+            "完全母猪化"
+          ]
+        },
+        "灵魂改造度": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴扩张度": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴直径": {
+          "default": 2,
+          "type": "number"
+        },
+        "敏感度": {
+          "default": 0,
+          "type": "number"
+        },
+        "肠道容量": {
+          "default": 500,
+          "type": "number"
+        },
+        "肠道内凝胶": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "占据百分比": {
+          "default": 0,
+          "type": "number"
+        },
+        "便意等级": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴插入物": {
+          "default": "无",
+          "type": "string",
+          "enum": [
+            "无",
+            "手指",
+            "肛塞",
+            "肛门拉珠",
+            "假阳具",
+            "其他"
+          ]
+        },
+        "排出凝胶总量": {
+          "default": 0,
+          "type": "number"
+        },
+        "本次高潮情境": {
+          "default": "无",
+          "type": "string"
+        },
+        "排出姿势": {
+          "default": "无",
+          "type": "string"
+        },
+        "淫纹": {
+          "default": "尚未浮现",
+          "type": "string"
+        },
+        "上装": {
+          "default": "黑白欧式女仆长裙",
+          "type": "string"
+        },
+        "下装": {
+          "default": "黑白女仆长裙与围裙",
+          "type": "string"
+        },
+        "内衣": {
+          "default": "白色棉质内衣",
+          "type": "string"
+        },
+        "袜子": {
+          "default": "白色过膝袜",
+          "type": "string"
+        },
+        "鞋子": {
+          "default": "黑色系带平底鞋",
+          "type": "string"
+        },
+        "内心想法": {
+          "default": "今天的三餐还差一道甜",
+          "type": "string"
+        }
+      }
+    },
+    "姜叙": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "阶段": {
+          "default": "沾染",
+          "type": "string",
+          "enum": [
+            "沾染",
+            "初步倒转",
+            "深层重塑",
+            "完全母猪化"
+          ]
+        },
+        "灵魂改造度": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴扩张度": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴直径": {
+          "default": 2,
+          "type": "number"
+        },
+        "敏感度": {
+          "default": 0,
+          "type": "number"
+        },
+        "肠道容量": {
+          "default": 500,
+          "type": "number"
+        },
+        "肠道内凝胶": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "占据百分比": {
+          "default": 0,
+          "type": "number"
+        },
+        "便意等级": {
+          "default": 0,
+          "type": "number"
+        },
+        "菊穴插入物": {
+          "default": "无",
+          "type": "string",
+          "enum": [
+            "无",
+            "手指",
+            "肛塞",
+            "肛门拉珠",
+            "假阳具",
+            "其他"
+          ]
+        },
+        "排出凝胶总量": {
+          "default": 0,
+          "type": "number"
+        },
+        "本次高潮情境": {
+          "default": "无",
+          "type": "string"
+        },
+        "排出姿势": {
+          "default": "无",
+          "type": "string"
+        },
+        "淫纹": {
+          "default": "尚未浮现",
+          "type": "string"
+        },
+        "上装": {
+          "default": "摄影马甲与针织衫",
+          "type": "string"
+        },
+        "下装": {
+          "default": "牛仔裤",
+          "type": "string"
+        },
+        "内衣": {
+          "default": "灰色运动内衣",
+          "type": "string"
+        },
+        "袜子": {
+          "default": "黑色短袜",
+          "type": "string"
+        },
+        "鞋子": {
+          "default": "帆布鞋",
+          "type": "string"
+        },
+        "内心想法": {
+          "default": "这个角度能用",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
