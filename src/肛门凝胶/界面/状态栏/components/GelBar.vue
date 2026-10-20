@@ -20,7 +20,7 @@
           v-for="(seg, index) in segments"
           :key="`${index}-${seg.name}`"
           class="gel-seg"
-          :class="{ 'is-active': activeIndex === index, 'is-shaking': shakingIndex === index }"
+          :class="[`shape-${index % 4}`, { 'is-active': activeIndex === index, 'is-shaking': shakingIndex === index }]"
           :style="segStyle(seg)"
           @mouseenter="hoveredIndex = index"
           @mouseleave="hoveredIndex = -1"
@@ -31,6 +31,7 @@
           <span class="gel-drops" aria-hidden="true"></span>
           <span class="gel-rim" aria-hidden="true"></span>
           <span class="gel-drip" aria-hidden="true"></span>
+          <span class="gel-drips" aria-hidden="true"> <i></i><i></i><i></i><i></i><i></i> </span>
         </div>
 
         <p v-if="!segments.length" class="gel-empty">肠里是空的</p>
@@ -38,6 +39,14 @@
         <!-- 总占据：永远钉在所有色块的最左边 -->
         <span class="gel-total" :style="{ '--c-total': totalColor }"> 占据 {{ occupyText }} </span>
       </div>
+
+      <Transition name="escape">
+        <div v-if="activeSeg" class="gel-escape" :style="escapeStyle" aria-hidden="true">
+          <span class="escape-neck"></span>
+          <span class="escape-drop"></span>
+          <span class="escape-splash"></span>
+        </div>
+      </Transition>
 
       <Transition name="tip">
         <div v-if="activeSeg" class="gel-tip" :style="tipStyle" role="tooltip" aria-live="polite">
@@ -146,6 +155,19 @@ const tipStyle = computed(() => {
     '--c-tip-bg': withAlpha(seg.color.solid, 0.96),
     '--c-tip-fg': seg.color.fg,
     '--c-tip-glow': withAlpha(seg.color.solid, 0.45),
+  } as Record<string, string>;
+});
+
+/** 越过管壁那一滴：钉在当前色块中线的正下方 */
+const escapeStyle = computed(() => {
+  const seg = activeSeg.value;
+  if (!seg) return {};
+  const center = 100 - (seg.right + seg.width / 2);
+  return {
+    left: `${_.clamp(center, 5, 95)}%`,
+    '--c-gel': seg.color.solid,
+    '--c-gel-soft': withAlpha(seg.color.solid, 0.92),
+    '--c-gel-glow': withAlpha(seg.color.solid, 0.5),
   } as Record<string, string>;
 });
 
@@ -344,12 +366,7 @@ function onSegmentClick(index: number) {
       rgba(255, 255, 255, 0.14) 15px 16px,
       rgba(255, 255, 255, 0) 16px 31px
     ),
-    repeating-linear-gradient(
-      82deg,
-      rgba(0, 0, 0, 0) 0 13px,
-      rgba(0, 0, 0, 0.12) 13px 14px,
-      rgba(0, 0, 0, 0) 14px 27px
-    );
+    repeating-linear-gradient(82deg, rgba(0, 0, 0, 0) 0 13px, rgba(0, 0, 0, 0.12) 13px 14px, rgba(0, 0, 0, 0) 14px 27px);
   background-size: 220% 100%;
   background-position: 0 0;
   mix-blend-mode: overlay;
@@ -434,6 +451,154 @@ function onSegmentClick(index: number) {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0));
   opacity: 0.5;
   animation: dripSway 5.2s ease-in-out infinite;
+}
+
+/* ── 不规则轮廓：四种形状轮流用，边缘像挤出来的胶而不是方角 ── */
+.gel-seg.shape-0 {
+  border-radius: 14px 8px 11px 7px / 42% 34% 52% 40%;
+}
+
+.gel-seg.shape-1 {
+  border-radius: 7px 13px 8px 12px / 34% 48% 38% 56%;
+}
+
+.gel-seg.shape-2 {
+  border-radius: 12px 9px 14px 8px / 50% 36% 44% 34%;
+}
+
+.gel-seg.shape-3 {
+  border-radius: 9px 14px 7px 11px / 38% 52% 34% 46%;
+}
+
+/* ── 管内液滴：悬停时几颗大小不一的胶滴沿内壁慢慢往下滑 ── */
+.gel-drips {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.gel-seg.is-active .gel-drips {
+  opacity: 1;
+}
+
+.gel-drips i {
+  position: absolute;
+  bottom: 2px;
+  border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), var(--c-gel-soft));
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.55);
+  opacity: 0;
+  animation: dripSlide 2.8s cubic-bezier(0.4, 0.05, 0.6, 0.95) infinite;
+}
+
+.gel-drips i:nth-child(1) {
+  left: 14%;
+  width: 3px;
+  height: 6px;
+  animation-duration: 2.4s;
+  animation-delay: 0.15s;
+}
+
+.gel-drips i:nth-child(2) {
+  left: 33%;
+  width: 4.5px;
+  height: 9px;
+  animation-duration: 3.1s;
+  animation-delay: 0.7s;
+}
+
+.gel-drips i:nth-child(3) {
+  left: 52%;
+  width: 2.6px;
+  height: 5px;
+  animation-duration: 2.1s;
+  animation-delay: 1.15s;
+}
+
+.gel-drips i:nth-child(4) {
+  left: 71%;
+  width: 3.8px;
+  height: 8px;
+  animation-duration: 3.6s;
+  animation-delay: 0.4s;
+}
+
+.gel-drips i:nth-child(5) {
+  left: 87%;
+  width: 3px;
+  height: 6.5px;
+  animation-duration: 2.7s;
+  animation-delay: 1.6s;
+}
+
+/* ── 管外那一滴：从管底渗出来，拉长、坠出透明管壁，到一定距离断裂消失 ── */
+.gel-escape {
+  position: absolute;
+  top: 100%;
+  z-index: 6;
+  width: 12px;
+  height: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.escape-neck {
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 3px;
+  height: 9px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--c-gel-soft);
+  box-shadow: 0 0 3px var(--c-gel-glow);
+  transform-origin: top center;
+  opacity: 0;
+  animation: escapeNeck 3.6s ease-in-out infinite;
+}
+
+.escape-drop {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 10px;
+  height: 14px;
+  margin-left: -5px;
+  border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c-gel) 55%, #fff), var(--c-gel));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 0 7px var(--c-gel-glow);
+  transform-origin: top center;
+  opacity: 0;
+  animation: escapeDrop 3.6s cubic-bezier(0.42, 0.05, 0.72, 0.98) infinite;
+}
+
+.escape-splash {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 16px;
+  height: 5px;
+  margin-left: -8px;
+  border-radius: 50%;
+  background: radial-gradient(50% 100% at 50% 20%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 72%);
+  opacity: 0;
+  animation: escapeSplash 3.6s ease-out infinite;
+}
+
+.escape-enter-active,
+.escape-leave-active {
+  transition: opacity 200ms ease;
+}
+
+.escape-enter-from,
+.escape-leave-to {
+  opacity: 0;
 }
 
 /* 悬停：果冻回弹 */
@@ -633,6 +798,101 @@ function onSegmentClick(index: number) {
   }
   50% {
     transform: translateX(-50%) scaleY(1.14) scaleX(0.94);
+  }
+}
+
+@keyframes dripSlide {
+  0% {
+    transform: translateY(-4px) scale(0.6, 0.5);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.92;
+  }
+  55% {
+    transform: translateY(9px) scale(1, 1.05);
+    opacity: 0.86;
+  }
+  82% {
+    transform: translateY(17px) scale(0.86, 1.35);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(23px) scale(0.62, 0.7);
+    opacity: 0;
+  }
+}
+
+@keyframes escapeNeck {
+  0%,
+  6% {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+  18% {
+    opacity: 0.75;
+    transform: scaleY(1);
+  }
+  62% {
+    opacity: 0.6;
+    transform: scaleY(1.9);
+  }
+  72% {
+    opacity: 0.25;
+    transform: scaleY(0.4);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
+
+@keyframes escapeDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-2px) scale(0.5, 0.4);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0) scale(1, 0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(15px) scale(0.86, 1.7);
+  }
+  66% {
+    opacity: 0.95;
+    transform: translateY(25px) scale(0.66, 2.05);
+  }
+  74% {
+    opacity: 0.9;
+    transform: translateY(30px) scale(0.95, 0.58);
+  }
+  88% {
+    opacity: 0.5;
+    transform: translateY(37px) scale(0.78, 0.68);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.42, 0.42);
+  }
+}
+
+@keyframes escapeSplash {
+  0%,
+  74% {
+    opacity: 0;
+    transform: scale(0.4, 0.3);
+  }
+  78% {
+    opacity: 0.75;
+    transform: scale(1, 0.8);
+  }
+  90%,
+  100% {
+    opacity: 0;
+    transform: scale(0.7, 1.1);
   }
 }
 
