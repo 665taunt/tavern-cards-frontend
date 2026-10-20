@@ -134,7 +134,7 @@ const dilateTag = computed(() => DILATE_TAGS[dilateTier(Number(profile.value.菊
 <style scoped>
 .panel {
   position: relative;
-  max-width: 720px;
+  max-width: 828px;
   margin: 0 auto;
   padding: 13px 14px 14px;
   border-radius: var(--radius-panel);
@@ -156,7 +156,7 @@ const dilateTag = computed(() => DILATE_TAGS[dilateTier(Number(profile.value.菊
   align-items: center;
   gap: 6px;
   font-family: var(--font-serif);
-  font-size: 12.5px;
+  font-size: 14px;
   letter-spacing: 0.1em;
   color: var(--c-primary-soft);
   margin-bottom: 9px;
@@ -170,7 +170,7 @@ const dilateTag = computed(() => DILATE_TAGS[dilateTier(Number(profile.value.菊
 .panel-hint {
   margin-left: auto;
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.04em;
   color: var(--c-text-faint);
 }
@@ -193,7 +193,7 @@ const dilateTag = computed(() => DILATE_TAGS[dilateTier(Number(profile.value.菊
   border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.11);
-  font-size: 10.5px;
+  font-size: 12px;
   letter-spacing: 0.05em;
   color: var(--c-text-muted);
   font-variant-numeric: tabular-nums;
@@ -225,7 +225,7 @@ const dilateTag = computed(() => DILATE_TAGS[dilateTier(Number(profile.value.菊
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.04em;
   color: var(--c-text-faint);
   font-variant-numeric: tabular-nums;

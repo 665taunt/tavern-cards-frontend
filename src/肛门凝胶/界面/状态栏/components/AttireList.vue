@@ -87,7 +87,7 @@ function toggle(slot: AttireSlot) {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.06em;
 }
 
@@ -97,7 +97,7 @@ function toggle(slot: AttireSlot) {
 
 .attire-hint {
   margin-left: auto;
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--c-text-faint);
 }
 
@@ -118,7 +118,7 @@ function toggle(slot: AttireSlot) {
   background: rgba(255, 255, 255, 0.05);
   color: var(--c-text-muted);
   font-family: var(--font-sans);
-  font-size: 10.5px;
+  font-size: 12px;
   cursor: pointer;
   transition:
     border-color 180ms ease,
@@ -179,21 +179,21 @@ function toggle(slot: AttireSlot) {
 
 .attire-card-slot {
   font-family: var(--font-serif);
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--c-primary-soft);
   letter-spacing: 0.08em;
 }
 
 .attire-card-value {
   margin-left: auto;
-  font-size: 10.5px;
+  font-size: 12px;
   color: var(--c-text);
 }
 
 .attire-card-line {
   display: flex;
   gap: 6px;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.7;
   color: var(--c-text-muted);
 }

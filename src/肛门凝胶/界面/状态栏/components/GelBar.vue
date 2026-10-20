@@ -26,8 +26,11 @@
           @mouseleave="hoveredIndex = -1"
           @click="onSegmentClick(index)"
         >
-          <span class="gel-wave" aria-hidden="true"></span>
-          <span class="gel-gloss" aria-hidden="true"></span>
+          <span class="gel-body" aria-hidden="true"></span>
+          <span class="gel-streaks" aria-hidden="true"></span>
+          <span class="gel-drops" aria-hidden="true"></span>
+          <span class="gel-rim" aria-hidden="true"></span>
+          <span class="gel-drip" aria-hidden="true"></span>
         </div>
 
         <p v-if="!segments.length" class="gel-empty">肠里是空的</p>
@@ -194,14 +197,14 @@ function onSegmentClick(index: number) {
 
 .gel-title {
   font-family: var(--font-serif);
-  font-size: 12.5px;
+  font-size: 14px;
   letter-spacing: 0.14em;
   color: var(--c-primary-soft);
 }
 
 .gel-meta {
   margin-left: auto;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.06em;
   color: var(--c-text-faint);
   font-variant-numeric: tabular-nums;
@@ -211,10 +214,10 @@ function onSegmentClick(index: number) {
   position: relative;
 }
 
-/* ── 玻璃管：15pt 厚、横向铺满 ── */
+/* ── 玻璃管：22.5pt 厚（原 15pt 加厚 50%）、横向铺满 ── */
 .gel-track {
   position: relative;
-  height: 15pt;
+  height: 22.5pt;
   border-radius: var(--radius-pill);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 40%, rgba(0, 0, 0, 0.28));
   border: 1px solid var(--c-track-edge);
@@ -265,75 +268,172 @@ function onSegmentClick(index: number) {
   background: rgba(255, 255, 255, 0.16);
 }
 
-/* ── 凝胶色块 ── */
+/* ── 凝胶色块：上缘爆亮、内部半透、下缘垂坠，照漫画里那团胶的画法 ── */
 .gel-seg {
   position: absolute;
   top: 1px;
   bottom: 1px;
   z-index: 1;
   min-width: 2px;
-  border-radius: 3px;
+  border-radius: 4px;
   background:
-    radial-gradient(120% 90% at 50% -20%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 62%),
-    linear-gradient(180deg, var(--c-gel-soft), var(--c-gel-edge));
+    radial-gradient(140% 130% at 26% -30%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 58%),
+    radial-gradient(90% 140% at 76% 130%, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 64%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--c-gel) 76%, #fff) 0%,
+      var(--c-gel-soft) 42%,
+      var(--c-gel-edge) 78%,
+      color-mix(in srgb, var(--c-gel) 74%, #000) 100%
+    );
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.55),
-    inset 0 -2px 3px rgba(0, 0, 0, 0.3),
-    0 0 6px var(--c-gel-glow);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.62),
+    inset 0 -7px 7px rgba(0, 0, 0, 0.34),
+    inset 0 3px 3px rgba(255, 255, 255, 0.32),
+    0 1px 3px rgba(0, 0, 0, 0.42),
+    0 0 10px var(--c-gel-glow);
   transform-origin: center bottom;
   transition:
     transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1),
     box-shadow 220ms ease,
     filter 220ms ease;
   cursor: pointer;
-  animation: gelBreathe 4.2s ease-in-out infinite;
+  animation: gelBreathe 5.4s ease-in-out infinite;
 }
 
 .gel-seg:nth-of-type(2n) {
-  animation-delay: -1.1s;
+  animation-delay: -1.4s;
 }
 
 .gel-seg:nth-of-type(3n) {
-  animation-delay: -2.3s;
+  animation-delay: -2.9s;
 }
 
-/* 液面波动：一层横向扫过的光 + 一层上下起伏的内芯 */
-.gel-wave {
+/* 内芯：上下各一团柔光，慢慢鼓起来又瘪下去，像胶在管子里晃 */
+.gel-body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
   overflow: hidden;
-  opacity: 0.75;
-  background: repeating-linear-gradient(
-    100deg,
-    rgba(255, 255, 255, 0) 0 6px,
-    rgba(255, 255, 255, 0.22) 6px 7px,
-    rgba(255, 255, 255, 0) 7px 14px
-  );
-  background-size: 200% 100%;
-  animation: gelFlow 3.4s linear infinite;
+  pointer-events: none;
+  background:
+    radial-gradient(62% 110% at 50% 128%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(38% 76% at 50% -16%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 72%);
   mix-blend-mode: screen;
+  opacity: 0.55;
+  animation: gelCorePulse 6.8s ease-in-out infinite;
 }
 
-.gel-wave::after {
+/* 水痕：两层斜向细亮纹各自漂移，再叠一道缓慢扫过的折射光 */
+.gel-streaks {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      78deg,
+      rgba(255, 255, 255, 0) 0 9px,
+      rgba(255, 255, 255, 0.22) 9px 10px,
+      rgba(255, 255, 255, 0) 10px 22px
+    ),
+    repeating-linear-gradient(
+      97deg,
+      rgba(255, 255, 255, 0) 0 15px,
+      rgba(255, 255, 255, 0.14) 15px 16px,
+      rgba(255, 255, 255, 0) 16px 31px
+    ),
+    repeating-linear-gradient(
+      82deg,
+      rgba(0, 0, 0, 0) 0 13px,
+      rgba(0, 0, 0, 0.12) 13px 14px,
+      rgba(0, 0, 0, 0) 14px 27px
+    );
+  background-size: 220% 100%;
+  background-position: 0 0;
+  mix-blend-mode: overlay;
+  opacity: 0.85;
+  animation: waterDrift 9s linear infinite;
+}
+
+.gel-streaks::after {
   content: '';
   position: absolute;
-  left: -30%;
-  bottom: -40%;
-  width: 160%;
-  height: 90%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 68%);
-  animation: gelSurge 3.8s ease-in-out infinite;
+  inset: 0;
+  background: linear-gradient(104deg, transparent 32%, rgba(255, 255, 255, 0.52) 48%, transparent 64%);
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  animation: causticSweep 7.2s ease-in-out infinite;
 }
 
-.gel-gloss {
+/* 水珠与气泡：几颗亮点贴在内壁上，慢慢往上浮 */
+.gel-drops {
   position: absolute;
-  inset: 1px 2px auto 2px;
-  height: 34%;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 18% 74%, rgba(255, 255, 255, 0.9) 0 1.2px, rgba(255, 255, 255, 0) 2.2px),
+    radial-gradient(circle at 44% 90%, rgba(255, 255, 255, 0.72) 0 1px, rgba(255, 255, 255, 0) 2px),
+    radial-gradient(circle at 66% 66%, rgba(255, 255, 255, 0.84) 0 1.3px, rgba(255, 255, 255, 0) 2.4px),
+    radial-gradient(circle at 84% 86%, rgba(255, 255, 255, 0.6) 0 1px, rgba(255, 255, 255, 0) 1.8px);
+  background-size:
+    46px 100%,
+    33px 100%,
+    59px 100%,
+    41px 100%;
+  background-position:
+    0 100%,
+    0 112%,
+    0 88%,
+    0 104%;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  animation: dropsRise 12s linear infinite;
+}
+
+/* 上缘：一条爆亮的高光带，顶边再加一根白线，是漫画里那圈反光 */
+.gel-rim {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 1px;
+  height: 30%;
   border-radius: var(--radius-pill);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0));
-  opacity: 0.6;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.24) 56%, rgba(255, 255, 255, 0));
+  filter: blur(0.3px);
+  mix-blend-mode: screen;
+  opacity: 0.62;
+  animation: rimShimmer 5.8s ease-in-out infinite;
+}
+
+.gel-rim::after {
+  content: '';
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: -1px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+}
+
+/* 下缘：胶往下坠出的那一小团，跟着呼吸轻轻抻长 */
+.gel-drip {
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: 64%;
+  height: 26%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 42% 42% / 60% 60% 40% 40%;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0));
+  opacity: 0.5;
+  animation: dripSway 5.2s ease-in-out infinite;
 }
 
 /* 悬停：果冻回弹 */
@@ -364,7 +464,7 @@ function onSegmentClick(index: number) {
   background: rgba(10, 8, 12, 0.82);
   border: 1px solid var(--c-total, var(--c-primary));
   color: #f6ece6;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
@@ -379,7 +479,7 @@ function onSegmentClick(index: number) {
   top: 50%;
   z-index: 1;
   transform: translate(-50%, -50%);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.14em;
   color: var(--c-text-faint);
 }
@@ -423,7 +523,7 @@ function onSegmentClick(index: number) {
 
 .gel-tip-name {
   font-family: var(--font-serif);
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1.4;
@@ -434,7 +534,7 @@ function onSegmentClick(index: number) {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 10.5px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   opacity: 0.94;
@@ -457,24 +557,82 @@ function onSegmentClick(index: number) {
   transform: translateX(-50%) translateY(4px) scale(0.94);
 }
 
-@keyframes gelFlow {
+@keyframes waterDrift {
   from {
     background-position: 0 0;
   }
   to {
-    background-position: -28px 0;
+    background-position: -42px 0;
   }
 }
 
-@keyframes gelSurge {
-  0%,
-  100% {
-    transform: translateX(-6%) translateY(2px) scaleY(0.86);
-    opacity: 0.55;
+@keyframes causticSweep {
+  0% {
+    transform: translateX(-38%);
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.6;
   }
   50% {
-    transform: translateX(4%) translateY(-2px) scaleY(1.04);
-    opacity: 0.85;
+    transform: translateX(6%);
+    opacity: 0.5;
+  }
+  78% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(46%);
+    opacity: 0;
+  }
+}
+
+@keyframes dropsRise {
+  from {
+    background-position:
+      0 130%,
+      0 142%,
+      0 118%,
+      0 134%;
+  }
+  to {
+    background-position:
+      0 -30%,
+      0 -18%,
+      0 -42%,
+      0 -26%;
+  }
+}
+
+@keyframes gelCorePulse {
+  0%,
+  100% {
+    transform: scaleY(1) translateY(0);
+    opacity: 0.72;
+  }
+  50% {
+    transform: scaleY(1.16) translateY(-2%);
+    opacity: 0.92;
+  }
+}
+
+@keyframes rimShimmer {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes dripSway {
+  0%,
+  100% {
+    transform: translateX(-50%) scaleY(0.86) scaleX(1);
+  }
+  50% {
+    transform: translateX(-50%) scaleY(1.14) scaleX(0.94);
   }
 }
 
@@ -484,7 +642,7 @@ function onSegmentClick(index: number) {
     transform: scaleY(1);
   }
   50% {
-    transform: scaleY(1.08);
+    transform: scaleY(1.12);
   }
 }
 

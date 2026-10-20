@@ -52,7 +52,7 @@ const isPublic = computed(() => props.scene === '公开');
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.06em;
   color: var(--c-text-faint);
   font-variant-numeric: tabular-nums;
@@ -81,7 +81,7 @@ const isPublic = computed(() => props.scene === '公开');
 
 .scene-place {
   font-family: var(--font-serif);
-  font-size: 13.5px;
+  font-size: 16px;
   letter-spacing: 0.05em;
   color: var(--c-text);
 }
@@ -89,7 +89,7 @@ const isPublic = computed(() => props.scene === '公开');
 .scene-tag {
   padding: 0 6px;
   border-radius: var(--radius-pill);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
   letter-spacing: 0.08em;
 }

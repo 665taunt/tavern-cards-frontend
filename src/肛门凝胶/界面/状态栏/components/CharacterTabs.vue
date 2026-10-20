@@ -42,7 +42,7 @@ const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
   background: rgba(255, 255, 255, 0.05);
   color: var(--c-text-muted);
   font-family: var(--font-serif);
-  font-size: 11.5px;
+  font-size: 13px;
   letter-spacing: 0.08em;
   cursor: pointer;
   transition:

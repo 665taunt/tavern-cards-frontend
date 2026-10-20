@@ -43,13 +43,13 @@ const tone = computed(() => {
 
 .stage-name {
   font-family: var(--font-serif);
-  font-size: 12.5px;
+  font-size: 14px;
   letter-spacing: 0.1em;
   color: #fdf2ee;
 }
 
 .stage-note {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.04em;
   color: rgba(253, 242, 238, 0.72);
 }

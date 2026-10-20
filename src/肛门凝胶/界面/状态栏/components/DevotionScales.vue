@@ -71,7 +71,7 @@ const courtingNote = computed(() => fillUser(COURTING_NOTES[props.character]?.[t
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.06em;
 }
 
@@ -94,7 +94,7 @@ const courtingNote = computed(() => fillUser(COURTING_NOTES[props.character]?.[t
   display: flex;
   align-items: baseline;
   gap: 6px;
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .scale-name {
@@ -113,7 +113,7 @@ const courtingNote = computed(() => fillUser(COURTING_NOTES[props.character]?.[t
   border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--c-text-muted);
 }
 
@@ -147,7 +147,7 @@ const courtingNote = computed(() => fillUser(COURTING_NOTES[props.character]?.[t
 }
 
 .scale-note {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
   color: var(--c-text-faint);
 }

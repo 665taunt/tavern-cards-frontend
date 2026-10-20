@@ -19,14 +19,14 @@ defineProps<{ text: string }>();
   background: linear-gradient(135deg, rgba(214, 154, 150, 0.14), rgba(142, 44, 63, 0.1));
   border: 1px solid rgba(214, 154, 150, 0.28);
   font-family: var(--font-serif);
-  font-size: 11.5px;
+  font-size: 13px;
   line-height: 1.68;
   color: #ecd8d3;
   font-style: italic;
 }
 
 .thought-quote {
-  font-size: 18px;
+  font-size: 21px;
   line-height: 1;
   color: rgba(214, 154, 150, 0.7);
   font-style: normal;

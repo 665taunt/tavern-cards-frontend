@@ -60,7 +60,7 @@ function stepColor(step: number): string {
   display: flex;
   align-items: baseline;
   gap: 7px;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.06em;
 }
 
@@ -70,7 +70,7 @@ function stepColor(step: number): string {
 
 .desire-name {
   font-family: var(--font-serif);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--c-primary-soft);
 }
 
@@ -123,7 +123,7 @@ function stepColor(step: number): string {
 }
 
 .desire-note {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
   color: var(--c-text-faint);
   letter-spacing: 0.02em;
