@@ -25,21 +25,25 @@
       :desire-level="profile.便意等级"
     />
 
+    <DesireBar class="panel-block" :level="profile.便意等级" />
+
     <div class="badge-row">
       <StageBadge :stage="profile.阶段" :imprinted="profile.淫纹 !== '尚未浮现'" />
       <span class="chip">插入物 {{ profile.菊穴插入物 }}</span>
       <span class="chip">直径 {{ profile.菊穴直径 }} cm</span>
       <span class="chip">敏感 {{ profile.敏感度 }} 阶</span>
+      <span class="chip is-tag">{{ dilateTag }}</span>
     </div>
 
     <div class="meters">
       <StatMeter label="灵魂改造度" :value="profile.灵魂改造度" :max="1000" tone="#8e2c3f" :marks="[5, 20, 50]" />
       <StatMeter label="菊穴扩张度" :value="profile.菊穴扩张度" :max="500" tone="#b8748a" :marks="[20, 40, 60, 80]" />
-      <StatMeter label="便意等级" :value="profile.便意等级" :max="5" unit="阶" tone="#d69a96" />
     </div>
 
+    <DevotionScales class="panel-block" :reform="profile.灵魂改造度" :character="activeName" />
+
     <div class="foot">
-      <AttireList :outfit="profile" />
+      <AttireList :outfit="profile" :character="activeName" :desire-level="profile.便意等级" />
       <ThoughtCard :text="profile.内心想法" />
       <div class="foot-meta">
         <span>排出累计 {{ Math.round(profile.排出凝胶总量) }} ml</span>
@@ -52,11 +56,14 @@
 <script setup lang="ts">
 import AttireList from './components/AttireList.vue';
 import CharacterTabs from './components/CharacterTabs.vue';
+import DesireBar from './components/DesireBar.vue';
+import DevotionScales from './components/DevotionScales.vue';
 import GelBar from './components/GelBar.vue';
 import SceneHeader from './components/SceneHeader.vue';
 import StageBadge from './components/StageBadge.vue';
 import StatMeter from './components/StatMeter.vue';
 import ThoughtCard from './components/ThoughtCard.vue';
+import { DILATE_TAGS, dilateTier } from './composables/useLore';
 import { useDataStore } from './store';
 
 /** 五名女角色的槽位同构，页签只是切换读取路径 */
@@ -119,6 +126,9 @@ const profile = computed<CharState>(() => {
     }
   );
 });
+
+/** 扩张度的档位落到一句人话：排出对她是什么 */
+const dilateTag = computed(() => DILATE_TAGS[dilateTier(Number(profile.value.菊穴扩张度) || 0)]);
 </script>
 
 <style scoped>
@@ -173,6 +183,11 @@ const profile = computed<CharState>(() => {
   margin: 10px 0 9px;
 }
 
+/* 便意条、双刻度这类块级组件与其它区块统一上边距 */
+.panel-block {
+  margin: 9px 0;
+}
+
 .chip {
   padding: 2px 8px;
   border-radius: var(--radius-pill);
@@ -182,6 +197,13 @@ const profile = computed<CharState>(() => {
   letter-spacing: 0.05em;
   color: var(--c-text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+/* 扩张度那句「排出对她是什么」，用品牌色点出来 */
+.chip.is-tag {
+  background: rgba(142, 44, 63, 0.22);
+  border-color: rgba(214, 154, 150, 0.42);
+  color: #f0c7c4;
 }
 
 .meters {
