@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 角色条目的「看不到的那一层」：成衣上为排出改过的地方、各档争宠手法、便意档位名。
  * 这些内容写在 身体状态 / 性格调色盘 条目里，变量里查不到，所以在前端按角色名带一份。
  */
@@ -51,14 +51,14 @@ export function devoTier(reform: number): '低' | '中' | '高' {
   return '低';
 }
 
-/** 对同伴的嫌恶：改造度抽走百合之后剩下来的那点旧情 */
+/** 对同伴的嫌恶：改造度抽走百合之后剩下来的那点旧情；{user} 渲染时替换 */
 export const AVERSION_NOTES: Record<'低' | '中' | '高', string> = {
   低: '维持体面，同桌递茶；递完在心里给人减一分',
-  中: '明着躲同伴，饭桌上只跟哥哥说话',
+  中: '明着躲同伴，饭桌上只跟{user}说话',
   高: '当空气，拿对方的短处换自己的机会',
 };
 
-/** 争宠：同一档里各人手法不同 */
+/** 争宠：同一档里各人手法不同；{user} 在渲染时换成玩家名字 */
 export const COURTING_NOTES: Record<string, Record<'低' | '中' | '高', string>> = {
   沈栖迟: {
     低: '端着，等他先开口',
@@ -67,7 +67,7 @@ export const COURTING_NOTES: Record<string, Record<'低' | '中' | '高', string
   },
   陆清晏: {
     低: '用会长的身份安排见面：这个周末有活动、那间屋更安静',
-    中: '抢着替哥哥做事，从端茶到整理衣领',
+    中: '抢着替{user}做事，从端茶到整理衣领',
     高: '门口排队，记着谁先进谁后进；拿别人的短处换机会',
   },
   傅翎: {
@@ -81,11 +81,36 @@ export const COURTING_NOTES: Record<string, Record<'低' | '中' | '高', string
     高: '用合身与口味当筹码，谁想吃先看她给不给',
   },
   姜叙: {
-    低: '哥哥一出现就把镜头转过去',
+    低: '{user}一出现就把镜头转过去',
     中: '抢着做记录，只有她拍得下那些场面',
-    高: '替哥哥拍，也把自己拍好递上去',
+    高: '替{user}拍，也把自己拍好递上去',
   },
 };
+
+/**
+ * 玩家名字：条目里统一写 <user>，界面要显真名。
+ * 先问酒馆上下文（name1 就是玩家角色名），拿不到再用宏替换兜底。
+ */
+export function getUserName(): string {
+  try {
+    const global = window as unknown as {
+      SillyTavern?: { getContext?: () => { name1?: string; name?: string } };
+      getContext?: () => { name1?: string; name?: string };
+    };
+    const ctx = global.SillyTavern?.getContext?.() ?? global.getContext?.();
+    const name = ctx?.name1 ?? ctx?.name;
+    if (typeof name === 'string' && name.trim()) return name.trim();
+  } catch {
+    // 上下文不可用时走宏替换
+  }
+  try {
+    const macro = substitudeMacros('{{user}}');
+    if (macro && macro !== '{{user}}') return macro;
+  } catch {
+    // 宏也不可用时用中性称呼
+  }
+  return '他';
+}
 
 /** 便意档位名：0-5 与 积蓄与失守 的便意等级一致 */
 export const DESIRE_LABELS = ['无感', '微沉', '坠胀', '需夹紧', '随时会崩', '崩决边缘'] as const;

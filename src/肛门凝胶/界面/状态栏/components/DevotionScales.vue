@@ -19,7 +19,9 @@
 
     <div class="scale">
       <div class="scale-row">
-        <span class="scale-name">争宠 · 哥哥</span>
+        <span class="scale-name"
+          >争宠 · <span class="scale-user">{{ userName }}</span></span
+        >
         <span class="scale-tier">{{ tier }}</span>
         <span class="scale-pct">{{ Math.round(courting) }}%</span>
       </div>
@@ -32,19 +34,27 @@
 </template>
 
 <script setup lang="ts">
-import { AVERSION_NOTES, COURTING_NOTES, devoTier } from '../composables/useLore';
+import { AVERSION_NOTES, COURTING_NOTES, devoTier, getUserName } from '../composables/useLore';
 
 const props = defineProps<{ reform: number; character: string }>();
 
 const reform = computed(() => _.clamp(Number(props.reform) || 0, 0, 1000));
 const tier = computed(() => devoTier(reform.value));
 
+/** 玩家名字：条目里写 <user>，界面上显真名；换人设时跟着变 */
+const userName = getUserName();
+
 // 两条刻度不同曲线：嫌恶起得早、争宠起得晚（先烦同伴，才轮到争）
 const aversion = computed(() => _.clamp((reform.value / 500) * 100, 0, 100));
 const courting = computed(() => _.clamp(((reform.value - 100) / 400) * 100, 0, 100));
 
-const aversionNote = computed(() => AVERSION_NOTES[tier.value]);
-const courtingNote = computed(() => COURTING_NOTES[props.character]?.[tier.value] ?? '还没有自己的争宠手法');
+/** 文案里的 {user} 统一换成玩家名字 */
+function fillUser(text: string): string {
+  return text.replaceAll('{user}', userName);
+}
+
+const aversionNote = computed(() => fillUser(AVERSION_NOTES[tier.value]));
+const courtingNote = computed(() => fillUser(COURTING_NOTES[props.character]?.[tier.value] ?? '还没有自己的争宠手法'));
 </script>
 
 <style scoped>
@@ -91,6 +101,11 @@ const courtingNote = computed(() => COURTING_NOTES[props.character]?.[tier.value
   font-family: var(--font-serif);
   color: var(--c-text);
   letter-spacing: 0.04em;
+}
+
+/* 玩家名字：比标签亮一档，换人设时这一处最先被看见 */
+.scale-user {
+  color: var(--c-primary-soft);
 }
 
 .scale-tier {
