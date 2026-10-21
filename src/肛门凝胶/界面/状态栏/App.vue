@@ -145,8 +145,6 @@ const dilateTag = computed(() => DILATE_TAGS[dilateTier(Number(profile.value.菊
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(14px) saturate(130%);
-  -webkit-backdrop-filter: blur(14px) saturate(130%);
   color: var(--c-text);
   line-height: 1.5;
 }

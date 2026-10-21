@@ -44,8 +44,6 @@ const isPublic = computed(() => props.scene === '公开');
   background: var(--glass-specular), var(--c-surface-raised);
   border: 1px solid var(--c-border);
   box-shadow: var(--glass-inner);
-  backdrop-filter: blur(8px) saturate(125%);
-  -webkit-backdrop-filter: blur(8px) saturate(125%);
 }
 
 .scene-line {
