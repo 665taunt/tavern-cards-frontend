@@ -20,7 +20,14 @@
           v-for="(seg, index) in segments"
           :key="`${index}-${seg.name}`"
           class="gel-seg"
-          :class="[`shape-${index % 4}`, { 'is-active': activeIndex === index, 'is-shaking': shakingIndex === index }]"
+          :class="[
+            `shape-${index % 4}`,
+            {
+              'is-active': activeIndex === index,
+              'is-shaking': shakingIndex === index,
+              'is-shedding': shedding && activeIndex === index,
+            },
+          ]"
           :style="segStyle(seg)"
           @mouseenter="hoveredIndex = index"
           @mouseleave="hoveredIndex = -1"
@@ -41,7 +48,7 @@
       </div>
 
       <Transition name="escape">
-        <div v-if="activeSeg" class="gel-escape" :style="escapeStyle" aria-hidden="true">
+        <div v-if="activeSeg && shedding" class="gel-escape" :style="escapeStyle" aria-hidden="true">
           <span class="escape-neck"></span>
           <span class="escape-drop"></span>
           <span class="escape-splash"></span>
@@ -132,6 +139,43 @@ const totalVolume = computed(() => segments.value.reduce((sum, seg) => sum + seg
 
 const activeIndex = computed(() => (pinnedIndex.value >= 0 ? pinnedIndex.value : hoveredIndex.value));
 const activeSeg = computed(() => (activeIndex.value >= 0 ? (segments.value[activeIndex.value] ?? null) : null));
+
+/**
+ * 液滴的爆发与冷却：激活色块时先演一轮 BURST_MS，然后静默 CD_MS 再来下一轮。
+ * 动画不是常驻的，同一时刻只有一个色块在滴，避免多层楼同时跑动画把显存吃满。
+ */
+const SHED_BURST_MS = 3800;
+const SHED_CD_MS = 9000;
+const shedding = ref(false);
+let burstTimer: number | undefined;
+let cdTimer: number | undefined;
+
+function clearShedTimers() {
+  if (burstTimer !== undefined) {
+    window.clearTimeout(burstTimer);
+    burstTimer = undefined;
+  }
+  if (cdTimer !== undefined) {
+    window.clearTimeout(cdTimer);
+    cdTimer = undefined;
+  }
+}
+
+function shedOnce() {
+  shedding.value = true;
+  burstTimer = window.setTimeout(() => {
+    shedding.value = false;
+    cdTimer = window.setTimeout(shedOnce, SHED_CD_MS);
+  }, SHED_BURST_MS);
+}
+
+watch(activeIndex, index => {
+  clearShedTimers();
+  shedding.value = false;
+  if (index >= 0) shedOnce();
+});
+
+onBeforeUnmount(clearShedTimers);
 
 const occupyText = computed(() => {
   const value = Number(props.occupy);
@@ -248,8 +292,6 @@ function onSegmentClick(index: number) {
     inset 0 -2px 6px rgba(0, 0, 0, 0.5),
     inset 0 0 12px rgba(0, 0, 0, 0.35),
     0 2px 10px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(6px) saturate(130%);
-  -webkit-backdrop-filter: blur(6px) saturate(130%);
   overflow: hidden;
   isolation: isolate;
 }
@@ -924,6 +966,52 @@ function onSegmentClick(index: number) {
   }
   100% {
     transform: translateX(0) scaleY(1.08);
+  }
+}
+
+/* ── 性能：所有光效只在爆发窗口里跑；其余时间整块静止，只留色块呼吸 ── */
+.gel-body,
+.gel-streaks,
+.gel-streaks::after,
+.gel-drops,
+.gel-rim,
+.gel-drip,
+.gel-drips i,
+.escape-neck,
+.escape-drop,
+.escape-splash {
+  animation-play-state: paused;
+}
+
+.gel-seg.is-shedding .gel-body,
+.gel-seg.is-shedding .gel-streaks,
+.gel-seg.is-shedding .gel-streaks::after,
+.gel-seg.is-shedding .gel-drops,
+.gel-seg.is-shedding .gel-rim,
+.gel-seg.is-shedding .gel-drip,
+.gel-seg.is-shedding .gel-drips i {
+  animation-play-state: running;
+  animation-iteration-count: 1;
+}
+
+.escape-neck,
+.escape-drop,
+.escape-splash {
+  animation-iteration-count: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gel-seg,
+  .gel-body,
+  .gel-streaks,
+  .gel-drops,
+  .gel-rim,
+  .gel-drip,
+  .gel-drips i,
+  .escape-neck,
+  .escape-drop,
+  .escape-splash {
+    animation: none !important;
   }
 }
 </style>

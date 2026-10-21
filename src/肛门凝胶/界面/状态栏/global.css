@@ -50,6 +50,13 @@
   --font-sans: 'Noto Sans SC', system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
+/* 后台冻结：所有动画停在原地，不再占合成器时间 */
+body.is-background *,
+body.is-background *::before,
+body.is-background *::after {
+  animation-play-state: paused !important;
+}
+
 body {
   font-family: var(--font-sans);
   color: var(--c-text);
